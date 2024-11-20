@@ -23,7 +23,44 @@ class LibroResource extends Resource
     {
         return $form
             ->schema([
-                //
+                //titulo
+                Forms\Components\TextInput::make('titulo')
+                ->required(),
+                //genero_id
+                Forms\Components\Select::make('genero_id')
+                //label
+                ->label('Genero')
+                ->relationship('generos', 'nombre')
+                ->preload()
+                ->createOptionForm([
+                    Forms\Components\TextInput::make('nombre')
+                        ->required()
+                        ->maxLength(100),
+                ])
+                ->required(),
+
+                Forms\Components\Select::make('editorial_id')
+                //label
+                ->label('Editorial')
+                ->relationship('editoriales', 'nombre')
+                ->preload()
+                ->searchable()
+                ->createOptionForm([
+                    Forms\Components\TextInput::make('nombre')
+                        ->required()
+                        ->maxLength(100),
+                ])
+                ->required(),
+
+                Forms\Components\Select::make('autor_id')
+                ->label('Autor')
+                ->relationship('autors', 'id', fn ($query) =>
+                    $query->selectRaw("id, CONCAT(nombres, ' ', apellidos) AS nombre_completo") // Alias en la consulta
+                )
+                ->getOptionLabelFromRecordUsing(fn ($record) => $record->nombre_completo) // Mostrar el nombre completo en la lista desplegable
+                ->preload()
+                ->required(),
+
             ]);
     }
 
@@ -31,7 +68,17 @@ class LibroResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('titulo')
+                ->sortable()
+                ->searchable(),
+                Tables\Columns\TextColumn::make('generos.nombre')
+                ->sortable()
+                ->searchable(),
+                Tables\Columns\TextColumn::make('editoriales.nombre')
+                ->searchable(),
+                Tables\Columns\TextColumn::make('autors.nombres')
+                ->label('Autor')
+                ->searchable(),
             ])
             ->filters([
                 //

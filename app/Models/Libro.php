@@ -13,16 +13,16 @@ class Libro extends Model
 
     public function generos(): BelongsTo
     {
-        return $this->belongsTo(Genero::class);
+        return $this->belongsTo(Genero::class, 'genero_id');
     }
 
-    public function editorial(): BelongsTo
+    public function editoriales(): BelongsTo
     {
-        return $this->belongsTo(Editorial::class);
+        return $this->belongsTo(Editorial::class, 'editorial_id');
     }
 
-    public function autor(): BelongsTo
+    public function autors(): BelongsTo
     {
-        return $this->belongsTo(Autor::class);
+        return $this->belongsTo(Autor::class, 'autor_id');
     }
 }

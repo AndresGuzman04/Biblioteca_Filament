@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Autor extends Model
 {
+    protected $table = 'autors';
 
     public function paises(): BelongsTo
     {
