@@ -35,12 +35,12 @@ cp .env.example .env
 
 # Edita el archivo .env para configurar:
 
-DB_CONNECTION=mysql
+B_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=nombre_de_la_base
-DB_USERNAME=usuario
-DB_PASSWORD=contraseña
+DB_DATABASE=biblioteca
+DB_USERNAME=root
+DB_PASSWORD=
 
 # Generar la clave de la aplicación
 
