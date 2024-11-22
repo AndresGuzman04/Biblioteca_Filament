@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table-> foreignId('libro_id')->constrained('libros')->cascadeOnDelete();
             $table->foreignId('persona_id')->constrained('personas')->cascadeOnDelete();
-            $table->date('fecha_prestamo');
+            $table->date('fecha_prestamo')->default(DB::raw('CURRENT_DATE'));
             $table->date('fecha_devolucion');
+            //estado 0: pendiente, 1: devuelto, 2: vencido
+            $table->tinyInteger('estado')->default(0);
             $table->timestamps();
         });
     }

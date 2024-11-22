@@ -75,6 +75,7 @@ class LibroResource extends Resource
                 ->sortable()
                 ->searchable(),
                 Tables\Columns\TextColumn::make('editoriales.nombre')
+                ->label('Editorial')
                 ->searchable(),
                 Tables\Columns\TextColumn::make('autors.nombres')
                 ->label('Autor')
