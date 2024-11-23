@@ -50,6 +50,10 @@ php artisan key:generate
 
 php artisan migrate 
 
+# Ejecutar Seeders
+
+php artisan db:seed
+
 # Iniciar el servidor de desarrollo
 
 php artisan serve
