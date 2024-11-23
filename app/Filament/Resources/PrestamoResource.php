@@ -13,6 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+//Filtros
+use Filament\Tables\Filters\SelectFilter;
+
 class PrestamoResource extends Resource
 {
     protected static ?string $model = Prestamo::class;
@@ -79,23 +82,22 @@ class PrestamoResource extends Resource
                     // Revisa automáticamente si la fecha de devolución ya pasó
                     if ($get('estado') === 0 && $get('fecha_devolucion') < now()->format('Y-m-d')) {
                         $set('estado', 2); // Cambia el estado a "Vencido"
+                        // Actualiza la base de datos
+                        \App\Models\Prestamo::where('id', $get('id'))->update(['estado' => 2]);
                     }
                 }),
 
                 //Estado
-                Forms\Components\Select::make('estado')
+                Forms\Components\Select::make('estado_id')
                 ->label('Estado')
-                ->options([
-                    0 => 'Pendiente',
-                    1 => 'Devuelto',
-                    2 => 'Vencido',
-                ])
-                ->default(0) // Estado inicial como "Pendiente" (clave 0)
+                ->relationship('estados', 'name_estado')
+                ->preload() 
                 ->required()
+                ->default(fn () => 1) // Estado inicial como "Pendiente" (ID 1 en la tabla estados)
                 ->disabled(fn (callable $get) => $get('id') === null) // Desactiva si el formulario está en modo de creación
                 ->reactive() // Permite observar cambios en este campo
                 ->afterStateUpdated(function ($state, callable $set) {
-                    if ($state === 1) { // Devuelto
+                    if ($state === 2) { // Devuelto
                         $set('fecha_devolucion', now()->format('Y-m-d')); // Establece la fecha de devolución
                     }
                 }),
@@ -107,20 +109,28 @@ class PrestamoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('titulo')
-                ->sortable()
+                Tables\Columns\TextColumn::make('libros.titulo')
+                ->label('Libro')
                 ->searchable(),
-                Tables\Columns\TextColumn::make('generos.nombre')
-                ->sortable()
+                Tables\Columns\TextColumn::make('personas.nombres')
+                ->label('Persona')
                 ->searchable(),
-                Tables\Columns\TextColumn::make('editoriales.nombre')
-                ->searchable(),
-                Tables\Columns\TextColumn::make('autors.nombres')
-                ->label('Autor')
+                Tables\Columns\TextColumn::make('fecha_prestamo')
+                ->label('Prestamo')
+                ->sortable(),
+                Tables\Columns\TextColumn::make('fecha_devolucion')
+                ->label('Devolución')
+                ->sortable(),
+                Tables\Columns\TextColumn::make('estados.name_estado')
+                ->label('Estado') 
                 ->searchable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('Estado')
+                ->relationship('estados', 'name_estado')
+                ->searchable()
+                ->preload()
+                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

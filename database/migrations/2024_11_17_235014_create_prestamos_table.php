@@ -17,8 +17,9 @@ return new class extends Migration
             $table->foreignId('persona_id')->constrained('personas')->cascadeOnDelete();
             $table->date('fecha_prestamo')->default(DB::raw('CURRENT_DATE'));
             $table->date('fecha_devolucion');
-            //estado 0: pendiente, 1: devuelto, 2: vencido
-            $table->tinyInteger('estado')->default(0);
+            // Definir estado_id como unsignedBigInteger y agregar valor predeterminado
+            $table->unsignedBigInteger('estado_id')->default(1);
+            $table->foreign('estado_id')->references('id')->on('estados')->cascadeOnDelete();
             $table->timestamps();
         });
     }
