@@ -13,6 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+use Illuminate\Support\Facades\DB;
+
+
 //Filtros
 use Filament\Tables\Filters\SelectFilter;
 
@@ -26,6 +29,7 @@ class PrestamoResource extends Resource
     {
         return $form
             ->schema([
+                
                 //Libro
                 Forms\Components\Select::make('libro_id')
                 ->label('Libro')
@@ -101,8 +105,11 @@ class PrestamoResource extends Resource
                         $set('fecha_devolucion', now()->format('Y-m-d')); // Establece la fecha de devolución
                     }
                 }),
+
+                
                 
             ]);
+            
     }
 
     public static function table(Table $table): Table
@@ -114,7 +121,16 @@ class PrestamoResource extends Resource
                 ->searchable(),
                 Tables\Columns\TextColumn::make('personas.nombres')
                 ->label('Persona')
-                ->searchable(),
+                ->searchable()
+                ->getStateUsing(function ($record) {
+                    // Llamar al procedimiento almacenado con el ID de la persona
+                    $personaid = $record->id; // O ajusta según el nombre del campo que tiene el ID
+                    $result = DB::select('CALL GetDatosPersonasById(?)', [$personaid]);
+
+                    // Retornar el nombre de la persona si la consulta tiene un resultado
+                    return $result[0]->nombre_PersonaById ?? 'N/A'; // Si no se encuentra, retornar 'N/A'
+                })
+                ->sortable(),
                 Tables\Columns\TextColumn::make('fecha_prestamo')
                 ->label('Prestamo')
                 ->sortable(),
@@ -132,9 +148,7 @@ class PrestamoResource extends Resource
                 ->preload()
                 
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+            
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

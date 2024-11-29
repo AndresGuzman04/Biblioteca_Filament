@@ -13,6 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
+use Illuminate\Support\Facades\DB;
+
+
 class LibroResource extends Resource
 {
     protected static ?string $model = Libro::class;
@@ -79,7 +82,16 @@ class LibroResource extends Resource
                 ->searchable(),
                 Tables\Columns\TextColumn::make('autors.nombres')
                 ->label('Autor')
-                ->searchable(),
+                ->searchable()
+                ->getStateUsing(function ($record) {
+                    // Llamar al procedimiento almacenado con el ID de la persona
+                    $autorid = $record->id; // O ajusta según el nombre del campo que tiene el ID
+                    $result = DB::select('CALL GetDatosAutorsById(?)', [$autorid]);
+
+                    // Retornar el nombre de la persona si la consulta tiene un resultado
+                    return $result[0]->nombre_AutorById ?? 'N/A'; // Si no se encuentra, retornar 'N/A'
+                })
+                ->sortable(),
             ])
             ->filters([
                 //
