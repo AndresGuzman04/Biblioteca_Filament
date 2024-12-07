@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table-> foreignId('libro_id')->constrained('libros')->cascadeOnDelete();
             $table->foreignId('persona_id')->constrained('personas')->cascadeOnDelete();
-            $table->date('fecha_prestamo')->default(DB::raw('CURRENT_DATE'));
+            $table->date('fecha_prestamo')->notNull();
             $table->date('fecha_devolucion');
             // Definir estado_id como unsignedBigInteger y agregar valor predeterminado
             $table->unsignedBigInteger('estado_id')->default(1);
